@@ -68,6 +68,14 @@ const flappybird = {
 	altura: 24,
 	x: 10,
 	y: 50,
+	gravidade: 0.25,
+	velocidade: 0,
+	
+	atualiza() {
+		flappybird.velocidade = flappybird.velocidade + flappybird.gravidade;
+		flappybird.y = flappybird.y + flappybird.velocidade;
+	},
+	
 	desenha() {
 		contexto.drawImage(
 			sprites, 
@@ -80,11 +88,13 @@ const flappybird = {
 }
 
 function loop() {
+	flappybird.atualiza();
+
 	planoDeFundo.desenha();
 	chao.desenha();
 	flappybird.desenha();
-	
-	
+
+
 	requestAnimationFrame(loop);
 };
 
