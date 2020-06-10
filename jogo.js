@@ -60,37 +60,62 @@ const chao = {
 	}
 }
 
-//[Bird]
-const flappybird = {
-	spriteX: 0,
-	spriteY: 0,
-	largura: 33,
-	altura: 24,
-	x: 10,
-	y: 50,
-	pulo: 4.6,
-	gravidade: 0.25,
-	velocidade: 0,
+function fazColisao(flappybird, chao) {
+	const flappybirdY = flappybird.y + flappybird.altura;
+	const chaoY = chao.y;
 
-	pula() {
-		flappybird.velocidade = - flappybird.pulo;
-	},
-	
-	atualiza() {
-		flappybird.velocidade = flappybird.velocidade + flappybird.gravidade;
-		flappybird.y = flappybird.y + flappybird.velocidade;
-	},
-	
-	desenha() {
-		contexto.drawImage(
-			sprites, 
-			flappybird.spriteX, flappybird.spriteY,
-			flappybird.largura, flappybird.altura,
-			flappybird.x, flappybird.y,
-			flappybird.largura, flappybird.altura,
-		);
+	if(flappybirdY >= chaoY) {
+		return true;
 	}
+
+	return false;
 }
+
+//[Bird]
+function criaFlappyBird() {
+	const flappybird = {
+		spriteX: 0,
+		spriteY: 0,
+		largura: 33,
+		altura: 24,
+		x: 10,
+		y: 50,
+		pulo: 4.6,
+		pula() {
+			console.log('Devo pular');
+			console.log('[ANTES]', flappybird.velocidade);
+			flappybird.velocidade = - flappybird.pulo;
+			console.log('[DEPOIS]', flappybird.velocidade);
+		},
+
+		gravidade: 0.25,
+		velocidade: 0,
+		
+		atualiza() {
+			if (fazColisao(flappybird, chao)) {
+				console.log('Fez colisao');
+
+				mudaParaTela(telas.inicio)
+				return;
+			}
+
+			flappybird.velocidade = flappybird.velocidade + flappybird.gravidade;
+			flappybird.y = flappybird.y + flappybird.velocidade;
+		},
+		
+		desenha() {
+			contexto.drawImage(
+				sprites, 
+				flappybird.spriteX, flappybird.spriteY,
+				flappybird.largura, flappybird.altura,
+				flappybird.x, flappybird.y,
+				flappybird.largura, flappybird.altura,
+			);
+		}
+	}
+	return flappybird;
+}
+
 
 //[Abertura]
 const abertura = {
@@ -112,18 +137,27 @@ const abertura = {
 }
 
 // TELAS
+const globais = {};
+
 let telaAtiva = {};
 
 function mudaParaTela(novaTela) {
 	telaAtiva = novaTela;
+
+	if (telaAtiva.inicializa) {
+		telaAtiva.inicializa();
+	}
 }
 
 const telas = {
 	inicio: {
+		inicializa() {
+			globais.flappybird = criaFlappyBird();
+		},
 		desenha() {
 			planoDeFundo.desenha();
 			chao.desenha();
-			flappybird.desenha();	
+			globais.flappybird.desenha();	
 			abertura.desenha();
 		},
 
@@ -141,13 +175,13 @@ telas.JOGO = {
 	desenha() {
 		planoDeFundo.desenha();
 		chao.desenha();
-		flappybird.desenha();	
+		globais.flappybird.desenha();	
 	},
 	click() {
-		flappybird.pula();
+		globais.flappybird.pula();
 	},
 	atualiza() {
-		flappybird.atualiza();
+		globais.flappybird.atualiza();
 	}
 }
 
